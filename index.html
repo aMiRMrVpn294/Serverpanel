@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>پنل V2Ray | MrVPN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/vazir-font@latest/dist/font-face.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Vazir', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: #fff;
+      text-align: center;
+      padding: 30px;
+      margin: 0;
+    }
+    h1 { font-size: 2em; margin-bottom: 10px; }
+    p { font-size: 1.1em; margin-bottom: 20px; }
+    input, button {
+      padding: 12px;
+      margin: 10px;
+      border-radius: 8px;
+      border: none;
+      width: 80%;
+      max-width: 300px;
+      font-size: 1em;
+      transition: 0.3s;
+    }
+    input {
+      background: #ffffff22;
+      color: #fff;
+    }
+    button {
+      background: #ff6f61;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ff3b2e;
+    }
+    .config-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+    .hidden { display: none; }
+    #configs p {
+      word-break: break-word;
+      font-size: 0.9em;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎉 پنل V2Ray | MrVPN</h1>
+  <p>برای استفاده، ابتدا نام کاربری وارد کنید</p>
+
+  <div id="auth">
+    <input type="text" id="username" placeholder="نام کاربری"><br>
+    <button onclick="login()">ورود</button>
+  </div>
+
+  <div id="panel" class="hidden">
+    <h2>✅ کانفیگ‌های فعال</h2>
+    <div id="configs"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script>
+    function createElement(tag) {
+      return document.createElement(tag);
+    }
+
+    function login() {
+      const username = document.getElementById("username").value;
+      if (!username) return alert("نام کاربری را وارد کنید");
+      document.getElementById("auth").classList.add("hidden");
+      document.getElementById("panel").classList.remove("hidden");
+      loadConfigs();
+    }
+
+    function loadConfigs() {
+      fetch("https://raw.githubusercontent.com/aMiRMrVpn294/PanelAmirv2/refs/heads/main/sub.txt")
+        .then(res => res.text())
+        .then(text => {
+          const lines = text.split("\n").filter(x => x.trim());
+          const container = document.getElementById("configs");
+          lines.forEach((config, index) => {
+            const box = createElement("div");
+            box.className = "config-box";
+
+            const qr = createElement("div");
+            qr.id = "qr" + index;
+            new QRCode(qr, { text: config, width: 128, height: 128 });
+
+            const textEl = createElement("p");
+            textEl.innerText = config;
+
+            const copyBtn = createElement("button");
+            copyBtn.innerText = "📋 کپی";
+            copyBtn.onclick = () => {
+              navigator.clipboard.writeText(config);
+              alert("کپی شد!");
+            };
+
+            const shareBtn = createElement("button");
+            shareBtn.innerText = "🔗 اشتراک‌گذاری";
+            shareBtn.onclick = () => {
+              if (navigator.share) {
+                navigator.share({ title: "MrVPN", text: config });
+              } else {
+                alert("اشتراک‌گذاری توسط مرورگر پشتیبانی نمی‌شود");
+              }
+            };
+
+            [qr, textEl, copyBtn, shareBtn].forEach(el => box.appendChild(el));
+            container.appendChild(box);
+          });
+        })
+        .catch(err => {
+          console.error("خطا در دریافت کانفیگ‌ها:", err);
+          document.getElementById("configs").innerText = "خطا در دریافت اطلاعات";
+        });
+    }
+  </script>
+</body>
+</html>
