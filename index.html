@@ -85,7 +85,7 @@
     }
 
     function loadConfigs() {
-      fetch("https://raw.githubusercontent.com/aMiRMrVpn294/PanelAmirv2/refs/heads/main/sub.txt")
+      fetch("https://raw.githubusercontent.com/aMiRMrVpn294/PanelAmirv2/main/sub.txt")
         .then(res => res.text())
         .then(text => {
           const lines = text.split("\n").filter(x => x.trim());
